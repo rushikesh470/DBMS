@@ -1,1 +1,202 @@
+CREATE TABLE Alumni (
+    alumni_id NUMBER PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    email VARCHAR2(100),
+    graduation_year NUMBER,
+    major VARCHAR2(100),
+    current_position VARCHAR2(100),
+    company_name VARCHAR2(100)
+);
+CREATE TABLE Contributions (
+    contribution_id NUMBER PRIMARY KEY,
+    alumni_id NUMBER REFERENCES Alumni(alumni_id),
+    description VARCHAR2(500),
+    contribution_date DATE,
+    contribution_type VARCHAR2(100),  -- e.g., Donation, Mentorship, Job Placement
+    amount NUMBER,  -- If the contribution is monetary
+    achievement VARCHAR2(500)  -- Description of the achievement
+);
+CREATE TABLE Events (
+    event_id NUMBER PRIMARY KEY,
+    event_name VARCHAR2(100),
+    event_date DATE,
+    event_location VARCHAR2(200),
+    event_description VARCHAR2(500)
+);
+CREATE TABLE Event_Management (
+    event_management_id NUMBER PRIMARY KEY,
+    alumni_id NUMBER REFERENCES Alumni(alumni_id),
+    event_id NUMBER REFERENCES Events(event_id),
+    participation_type VARCHAR2(100),  -- e.g., Speaker, Attendee, Sponsor
+    feedback VARCHAR2(500)  -- Feedback from alumni for the event
+);
+CREATE TABLE Logs (
+    log_id NUMBER PRIMARY KEY,
+    action VARCHAR2(50),  -- e.g., 'UPDATE', 'INSERT', 'DELETE'
+    action_date DATE DEFAULT SYSDATE,
+    table_name VARCHAR2(50),
+    old_value VARCHAR2(500),
+    new_value VARCHAR2(500)
+);
+
+
+
+
+
+-- Inserting sample alumni data
+INSERT INTO Alumni (alumni_id, first_name, last_name, email, graduation_year, major, current_position, company_name)
+VALUES (1, 'John', 'Doe', 'john.doe@example.com', 2010, 'Computer Science', 'Software Engineer', 'TechCorp');
+
+INSERT INTO Alumni (alumni_id, first_name, last_name, email, graduation_year, major, current_position, company_name)
+VALUES (2, 'Jane', 'Smith', 'jane.smith@example.com', 2012, 'Electrical Engineering', 'Project Manager', 'EnergySolutions');
+
+INSERT INTO Alumni (alumni_id, first_name, last_name, email, graduation_year, major, current_position, company_name)
+VALUES (3, 'Michael', 'Brown', 'michael.brown@example.com', 2015, 'Mechanical Engineering', 'Senior Consultant', 'InnovateMech');
+
+INSERT INTO Alumni (alumni_id, first_name, last_name, email, graduation_year, major, current_position, company_name)
+VALUES (4, 'Emily', 'Johnson', 'emily.johnson@example.com', 2008, 'Business Administration', 'CEO', 'FinCorp');
+
+-- Inserting sample contributions data
+INSERT INTO Contributions (contribution_id, alumni_id, description, contribution_date, contribution_type, amount, achievement)
+VALUES (1, 1, 'Donated to the Computer Science Department for research', TO_DATE('2023-05-10', 'YYYY-MM-DD'), 'Donation', 5000, 'Research Fund for AI Lab');
+
+INSERT INTO Contributions (contribution_id, alumni_id, description, contribution_date, contribution_type, amount, achievement)
+VALUES (2, 2, 'Mentorship program for new graduates', TO_DATE('2023-06-01', 'YYYY-MM-DD'), 'Mentorship', NULL, 'Guided 5 students in their job search');
+
+INSERT INTO Contributions (contribution_id, alumni_id, description, contribution_date, contribution_type, amount, achievement)
+VALUES (3, 3, 'Organized a networking event for alumni', TO_DATE('2023-07-15', 'YYYY-MM-DD'), 'Event Organization', NULL, 'Facilitated Networking Event for 100 Alumni');
+
+INSERT INTO Contributions (contribution_id, alumni_id, description, contribution_date, contribution_type, amount, achievement)
+VALUES (4, 4, 'Donation to the alumni association for scholarship fund', TO_DATE('2023-05-20', 'YYYY-MM-DD'), 'Donation', 2000, 'Scholarship Fund');
+-- Inserting sample event data
+INSERT INTO Events (event_id, event_name, event_date, event_location, event_description)
+VALUES (1, 'Alumni Networking Event', TO_DATE('2023-07-01', 'YYYY-MM-DD'), 'TechCorp Headquarters', 'Annual alumni networking event');
+
+INSERT INTO Events (event_id, event_name, event_date, event_location, event_description)
+VALUES (2, 'Alumni Reunion', TO_DATE('2023-08-10', 'YYYY-MM-DD'), 'University Campus', 'Reunion for alumni from 2005-2015');
+
+INSERT INTO Events (event_id, event_name, event_date, event_location, event_description)
+VALUES (3, 'Career Development Workshop', TO_DATE('2023-09-15', 'YYYY-MM-DD'), 'InnovateMech Auditorium', 'Workshop on career development for young alumni');
+
+
+-- Inserting sample event participation data
+INSERT INTO Event_Management (event_management_id, alumni_id, event_id, participation_type, feedback)
+VALUES (1, 1, 1, 'Speaker', 'Great event! Met many alumni from different fields.');
+
+INSERT INTO Event_Management (event_management_id, alumni_id, event_id, participation_type, feedback)
+VALUES (2, 2, 2, 'Attendee', 'Wonderful to reconnect with old classmates.');
+
+INSERT INTO Event_Management (event_management_id, alumni_id, event_id, participation_type, feedback)
+VALUES (3, 3, 3, 'Speaker', 'The workshop was informative and beneficial for young alumni.');
+
+INSERT INTO Event_Management (event_management_id, alumni_id, event_id, participation_type, feedback)
+VALUES (4, 4, 1, 'Sponsor', 'Proud to sponsor this event and support the alumni community.');
+
+
+-- Inserting sample log data for changes made to the Alumni table
+INSERT INTO Logs (log_id, action, action_date, table_name, old_value, new_value)
+VALUES (1, 'UPDATE', SYSDATE, 'Alumni', 'john.doe@example.com', 'john.doe@newdomain.com');
+
+INSERT INTO Logs (log_id, action, action_date, table_name, old_value, new_value)
+VALUES (2, 'UPDATE', SYSDATE, 'Alumni', 'jane.smith@example.com', 'jane.smith@newdomain.com');
+
+INSERT INTO Logs (log_id, action, action_date, table_name, old_value, new_value)
+VALUES (3, 'INSERT', SYSDATE, 'Alumni', NULL, 'michael.brown@example.com');
+
+INSERT INTO Logs (log_id, action, action_date, table_name, old_value, new_value)
+VALUES (4, 'DELETE', SYSDATE, 'Alumni', 'emily.johnson@example.com', NULL);
+
+
+
+ --List of Alumni with their Contributions
+SELECT a.first_name, a.last_name, c.description, c.contribution_date, c.amount, c.achievement
+FROM Alumni a
+JOIN Contributions c ON a.alumni_id = c.alumni_id
+ORDER BY c.contribution_date DESC;
+
+
+--Total Contribution Amount by Alumni
+SELECT a.first_name, a.last_name, SUM(c.amount) AS total_contribution
+FROM Alumni a
+JOIN Contributions c ON a.alumni_id = c.alumni_id
+WHERE c.contribution_type = 'Donation'
+GROUP BY a.first_name, a.last_name
+ORDER BY total_contribution DESC;
+
+
+--Triggers for Logging Changes in Alumni Information
+
+CREATE OR REPLACE TRIGGER trg_alumni_update
+AFTER UPDATE ON Alumni
+FOR EACH ROW
+DECLARE
+    v_old_value VARCHAR2(500);
+    v_new_value VARCHAR2(500);
+BEGIN
+        IF :OLD.first_name != :NEW.first_name THEN
+        v_old_value := :OLD.first_name;
+        v_new_value := :NEW.first_name;
+        INSERT INTO Logs(action, table_name, old_value, new_value)
+        VALUES ('UPDATE', 'Alumni', v_old_value, v_new_value);
+    END IF;
+
+    IF :OLD.last_name != :NEW.last_name THEN
+        v_old_value := :OLD.last_name;
+        v_new_value := :NEW.last_name;
+        INSERT INTO Logs(action, table_name, old_value, new_value)
+        VALUES ('UPDATE', 'Alumni', v_old_value, v_new_value);
+    END IF;
+
+    IF :OLD.email != :NEW.email THEN
+        v_old_value := :OLD.email;
+        v_new_value := :NEW.email;
+        INSERT INTO Logs(action, table_name, old_value, new_value)
+        VALUES ('UPDATE', 'Alumni', v_old_value, v_new_value);
+    END IF;
+
+   END;
+/
+
+--Procedure for Event Management
+
+SELECT sequence_name FROM user_sequences WHERE sequence_name = 'EVENT_MANAGEMENT_SEQ';
+CREATE SEQUENCE Event_Management_SEQ
+START WITH 1
+INCREMENT BY 1
+NOCACHE;
+
+CREATE OR REPLACE PROCEDURE manage_event_participation (
+    p_alumni_id IN NUMBER,
+    p_event_id IN NUMBER,
+    p_participation_type IN VARCHAR2,
+    p_feedback IN VARCHAR2 DEFAULT NULL
+) IS
+BEGIN
+   
+    INSERT INTO Event_Management (event_management_id, alumni_id, event_id, participation_type, feedback)
+    VALUES (Event_Management_SEQ.NEXTVAL, p_alumni_id, p_event_id, p_participation_type, p_feedback);
+
+    COMMIT;
+   
+    DBMS_OUTPUT.PUT_LINE('Event participation has been successfully recorded.');
+EXCEPTION
+    WHEN OTHERS THEN
+      
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+END manage_event_participation;
+/
+
+
+BEGIN
+       manage_event_participation(
+        p_alumni_id => 1,              
+        p_event_id => 2,                
+        p_participation_type => 'Speaker',  
+        p_feedback => 'Excellent event, looking forward to next year!'  
+    );
+END;
+/
+
 
